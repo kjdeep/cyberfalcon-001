@@ -12,6 +12,15 @@ export default defineConfig({
 			"@": path.resolve(__dirname, "./src/web"),
 		},
 	},
+	// Vite 7 can run environment-specific builds (e.g. "client").
+	// Keep the limit in both top-level and client env to ensure it applies in CI/Vercel.
+	environments: {
+		client: {
+			build: {
+				chunkSizeWarningLimit: 900,
+			},
+		},
+	},
 	build: {
 		// Keep warning visibility but tune it for this app size.
 		chunkSizeWarningLimit: 900,
