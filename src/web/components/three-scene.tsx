@@ -1,6 +1,14 @@
 import { Canvas, useFrame } from "@react-three/fiber";
 import { useRef, useMemo } from "react";
-import * as THREE from "three";
+import {
+  AdditiveBlending,
+  MeshBasicMaterial,
+  Vector3,
+  type Group,
+  type LineSegments,
+  type Mesh,
+  type Points,
+} from "three";
 
 /* ─────────────────────────────────────────────
    Cybersecurity-themed 3D scene:
@@ -12,16 +20,16 @@ import * as THREE from "three";
 
 /* ─── Network Grid: interconnected nodes ─── */
 function NetworkGrid() {
-  const groupRef = useRef<THREE.Group>(null!);
-  const linesRef = useRef<THREE.LineSegments>(null!);
-  const nodesRef = useRef<THREE.Points>(null!);
+  const groupRef = useRef<Group>(null!);
+  const linesRef = useRef<LineSegments>(null!);
+  const nodesRef = useRef<Points>(null!);
 
   const { nodePositions, linePositions, nodeColors } = useMemo(() => {
     const nodes: number[] = [];
     const colors: number[] = [];
     const lines: number[] = [];
     const nodeCount = 60;
-    const nodeVecs: THREE.Vector3[] = [];
+    const nodeVecs: Vector3[] = [];
 
     // Generate random node positions in a sphere
     for (let i = 0; i < nodeCount; i++) {
@@ -32,7 +40,7 @@ function NetworkGrid() {
       const y = r * Math.sin(phi) * Math.sin(theta);
       const z = r * Math.cos(phi) - 3;
       nodes.push(x, y, z);
-      nodeVecs.push(new THREE.Vector3(x, y, z));
+      nodeVecs.push(new Vector3(x, y, z));
 
       // Node colors: mix of red, cyan, and white
       const t = Math.random();
@@ -87,7 +95,7 @@ function NetworkGrid() {
           <bufferAttribute attach="attributes-position" count={nodePositions.length / 3} array={nodePositions} itemSize={3} />
           <bufferAttribute attach="attributes-color" count={nodeColors.length / 3} array={nodeColors} itemSize={3} />
         </bufferGeometry>
-        <pointsMaterial size={0.08} vertexColors transparent opacity={0.7} sizeAttenuation blending={THREE.AdditiveBlending} />
+        <pointsMaterial size={0.08} vertexColors transparent opacity={0.7} sizeAttenuation blending={AdditiveBlending} />
       </points>
     </group>
   );
@@ -95,8 +103,8 @@ function NetworkGrid() {
 
 /* ─── Scanning Pulse Ring ─── */
 function ScanRing() {
-  const ringRef = useRef<THREE.Mesh>(null!);
-  const ring2Ref = useRef<THREE.Mesh>(null!);
+  const ringRef = useRef<Mesh>(null!);
+  const ring2Ref = useRef<Mesh>(null!);
 
   useFrame((state) => {
     const t = state.clock.elapsedTime;
@@ -105,12 +113,12 @@ function ScanRing() {
     const scale1 = 1 + Math.sin(t * 0.6) * 0.3;
     ringRef.current.scale.set(scale1, scale1, scale1);
     ringRef.current.rotation.z = t * 0.15;
-    (ringRef.current.material as THREE.MeshBasicMaterial).opacity = 0.08 + Math.sin(t * 0.6) * 0.04;
+    (ringRef.current.material as MeshBasicMaterial).opacity = 0.08 + Math.sin(t * 0.6) * 0.04;
 
     const scale2 = 1 + Math.cos(t * 0.4) * 0.2;
     ring2Ref.current.scale.set(scale2, scale2, scale2);
     ring2Ref.current.rotation.z = -t * 0.1;
-    (ring2Ref.current.material as THREE.MeshBasicMaterial).opacity = 0.05 + Math.cos(t * 0.4) * 0.03;
+    (ring2Ref.current.material as MeshBasicMaterial).opacity = 0.05 + Math.cos(t * 0.4) * 0.03;
   });
 
   return (
@@ -130,7 +138,7 @@ function ScanRing() {
 /* ─── Data Particles: floating upward like data packets ─── */
 function DataParticles() {
   const count = 200;
-  const ref = useRef<THREE.Points>(null!);
+  const ref = useRef<Points>(null!);
 
   const { positions, velocities, colors } = useMemo(() => {
     const pos = new Float32Array(count * 3);
@@ -178,14 +186,14 @@ function DataParticles() {
         <bufferAttribute attach="attributes-position" count={count} array={positions} itemSize={3} />
         <bufferAttribute attach="attributes-color" count={count} array={colors} itemSize={3} />
       </bufferGeometry>
-      <pointsMaterial size={0.03} vertexColors transparent opacity={0.5} sizeAttenuation blending={THREE.AdditiveBlending} />
+      <pointsMaterial size={0.03} vertexColors transparent opacity={0.5} sizeAttenuation blending={AdditiveBlending} />
     </points>
   );
 }
 
 /* ─── Shield Wireframe: rotating security shield ─── */
 function ShieldWireframe() {
-  const ref = useRef<THREE.Group>(null!);
+  const ref = useRef<Group>(null!);
 
   useFrame((state) => {
     const t = state.clock.elapsedTime;
@@ -288,7 +296,7 @@ function ShieldWireframe() {
 
 /* ─── Hex Grid Floor ─── */
 function HexGrid() {
-  const ref = useRef<THREE.Points>(null!);
+  const ref = useRef<Points>(null!);
 
   const positions = useMemo(() => {
     const pts: number[] = [];
