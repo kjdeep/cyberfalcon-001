@@ -12,38 +12,23 @@ export default defineConfig({
 			"@": path.resolve(__dirname, "./src/web"),
 		},
 	},
-	// Vite 7 can run environment-specific builds (e.g. "client").
-	// Keep the limit in both top-level and client env to ensure it applies in CI/Vercel.
-	environments: {
-		client: {
-			build: {
-				chunkSizeWarningLimit: 900,
-			},
-		},
-	},
 	build: {
-		// Keep warning visibility but tune it for this app size.
 		chunkSizeWarningLimit: 900,
 		rollupOptions: {
 			output: {
-				// Split heavy libraries so initial bundle stays leaner.
 				manualChunks(id: string) {
 					if (!id.includes("node_modules")) return;
 
-					if (id.includes("/three/")) return "three-core";
-					if (id.includes("/@react-three/fiber/")) return "r3f";
+					// Split only the heavy 3D ecosystem.
 					if (id.includes("/@react-three/drei/")) return "r3d";
+					if (id.includes("/@react-three/fiber/")) return "r3f";
 					if (id.includes("/three-stdlib/")) return "three-stdlib";
-					if (id.includes("/meshline/")) return "three-meshline";
 					if (id.includes("/troika-three-text/")) return "troika-text";
+					if (id.includes("/meshline/")) return "three-meshline";
+					if (id.includes("/three/")) return "three-core";
 
-					if (id.includes("/react/") || id.includes("/react-dom/")) return "react-core";
-					if (id.includes("/wouter/")) return "router";
-					if (id.includes("/lucide-react/")) return "icons";
-					if (id.includes("/radix-ui/") || id.includes("/@radix-ui/")) return "radix";
-
-					// Keep remaining third-party modules in a stable vendor chunk.
-					return "vendor";
+					// Let Rollup auto-chunk all other deps to avoid circular chunk graphs.
+					return;
 				},
 			},
 		},
