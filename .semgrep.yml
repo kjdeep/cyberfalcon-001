@@ -1,0 +1,13 @@
+rules:
+  - id: no-hardcoded-secrets
+    patterns:
+      - pattern: $X = "..."
+      - metavariable-regex: { metavariable: $X, regex: "(?i).*(secret|password|token|private_key).*" }
+    message: Load secrets from a vault-style environment or secret provider.
+    severity: ERROR
+    languages: [typescript, javascript, python]
+  - id: no-raw-sql-interpolation
+    pattern: $DB.execute(f"...")
+    message: Use parameterized queries.
+    severity: ERROR
+    languages: [python]

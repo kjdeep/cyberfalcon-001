@@ -1,6 +1,6 @@
 import { useState, useRef } from "react";
 import { motion, useInView } from "motion/react";
-import { Mail, Phone, MapPin, Send, Clock, CheckCircle2, AlertCircle, ArrowRight } from "lucide-react";
+import { Mail, Phone, MapPin, Send, Clock, CheckCircle2, AlertCircle } from "lucide-react";
 import Navbar from "../components/navbar";
 import Footer from "../components/footer";
 

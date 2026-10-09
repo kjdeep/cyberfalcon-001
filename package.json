@@ -1,5 +1,5 @@
 {
-  "name": "sandbox-website-template",
+  "name": "falconfleetops",
   "description": "A template for building a React application with Vite, Hono, and Cloudflare Workers",
   "private": true,
   "dependencies": {
@@ -25,6 +25,7 @@
     "react-dom": "19.2.4",
     "react-hook-form": "^7.71.2",
     "react-icons": "^5.6.0",
+    "recharts": "^3.10.1",
     "runable-website-runtime": "^0.0.14",
     "tailwind-merge": "^3.5.0",
     "three": "^0.184.0",

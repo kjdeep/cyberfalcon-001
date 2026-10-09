@@ -1,0 +1,36 @@
+services:
+  postgres:
+    image: timescale/timescaledb:latest-pg16
+    environment:
+      POSTGRES_DB: falconfleetops
+      POSTGRES_USER: fleetops
+      POSTGRES_PASSWORD: local-demo-only
+  redis:
+    image: redis:7-alpine
+  mqtt:
+    image: eclipse-mosquitto:2
+    volumes: ["./mosquitto.conf:/mosquitto/config/mosquitto.conf:ro"]
+  gateway-simulator:
+    build: ../gateway
+    environment:
+      FLEETOPS_MODE: simulation
+      MQTT_URL: mqtt://mqtt:1883
+    depends_on: [mqtt]
+  backend:
+    image: node:22-alpine
+    working_dir: /app
+    command: ["node", "run-demo.mjs"]
+    volumes: ["../backend:/app"]
+    environment:
+      DATABASE_URL: postgresql://fleetops:local-demo-only@postgres:5432/falconfleetops
+      REDIS_URL: redis://redis:6379
+      MQTT_URL: mqtt://mqtt:1883
+      PORT: 3001
+    depends_on: [postgres, redis, mqtt]
+  web:
+    image: node:22-alpine
+    working_dir: /app
+    command: ["npx", "vite", "--host", "0.0.0.0", "--port", "4205"]
+    volumes: ["..:/app"]
+    ports: ["4205:4205"]
+    depends_on: [backend, gateway-simulator]

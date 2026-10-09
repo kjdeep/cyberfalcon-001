@@ -1,0 +1,24 @@
+datasource db { provider = "postgresql" url = env("DATABASE_URL") }
+generator client { provider = "prisma-client-js" }
+
+enum RobotStatus { nominal degraded fault maintenance offline }
+enum DeploymentStrategy { immediate canary staged }
+enum DeploymentState { pending dispatched installing installed rolled_back failed }
+enum TicketStatus { open assigned in_progress waiting_parts resolved confirmed }
+
+enum DowntimeAttribution { fault software firmware parts_wait scheduled unknown }
+
+model Customer { id String @id @default(uuid()) name String billingPlan String robotCount Int stripeCustomerId String? sites Site[] users User[] createdAt DateTime @default(now()) updatedAt DateTime @updatedAt }
+model Site { id String @id @default(uuid()) name String address String timezone String customerId String config Json customer Customer @relation(fields: [customerId], references: [id]) robots Robot[] auditEvents AuditEvent[] createdAt DateTime @default(now()) updatedAt DateTime @updatedAt }
+model Robot { id String @id @default(uuid()) siteId String vendor String model String serialNumber String @unique firmwareVersion String canIdOrEndpoint String commissioningDate DateTime status RobotStatus lastSeen DateTime site Site @relation(fields: [siteId], references: [id]) telemetryRaw TelemetryRaw[] rollups1m TelemetryRollup1m[] anomalies Anomaly[] deployments FirmwareDeployment[] tickets MaintenanceTicket[] downtime DowntimeEvent[] createdAt DateTime @default(now()) updatedAt DateTime @updatedAt @@index([siteId, status]) }
+model TelemetryRaw { id BigInt @id @default(autoincrement()) robotId String ts DateTime metrics Json source String robot Robot @relation(fields: [robotId], references: [id]) @@index([robotId, ts]) }
+model TelemetryRollup1m { id BigInt @id @default(autoincrement()) robotId String ts DateTime batteryPctAvg Float tempMax Float distanceM Float runtimeS Int faultCodes String[] status RobotStatus robot Robot @relation(fields: [robotId], references: [id]) @@index([robotId, ts]) }
+model FirmwareImage { id String @id @default(uuid()) vendor String model String version String sha256 String signature String notes String curatedBy String releasedAt DateTime riskFlags Json deployments FirmwareDeployment[] createdAt DateTime @default(now()) updatedAt DateTime @updatedAt }
+model FirmwareDeployment { id String @id @default(uuid()) robotId String imageId String strategy DeploymentStrategy state DeploymentState startedAt DateTime? completedAt DateTime? rolloutLog Json robot Robot @relation(fields: [robotId], references: [id]) image FirmwareImage @relation(fields: [imageId], references: [id]) createdAt DateTime @default(now()) updatedAt DateTime @updatedAt }
+model Anomaly { id String @id @default(uuid()) robotId String type String severity String detectedTs DateTime modelVersion String evidence Json predictedFailureTs DateTime? affectedComponent String recommendedAction String dismissedBy String? dismissedReason String? robot Robot @relation(fields: [robotId], references: [id]) createdAt DateTime @default(now()) updatedAt DateTime @updatedAt }
+model MaintenanceTicket { id String @id @default(uuid()) robotId String createdBy String status TicketStatus priority String faultCodes String[] rootCause String? partsUsed Json[] technicianId String? downtimeMinutes Int costBreakdown Json resolvedAt DateTime? robot Robot @relation(fields: [robotId], references: [id]) createdAt DateTime @default(now()) updatedAt DateTime @updatedAt }
+model Part { id String @id @default(uuid()) vendor String model String partNumber String @unique description String unitCost Decimal stockLocations Json leadTimeDays Int createdAt DateTime @default(now()) updatedAt DateTime @updatedAt }
+model PartsOrder { id String @id @default(uuid()) ticketId String items Json status String orderedAt DateTime? deliveredAt DateTime? supplier String createdAt DateTime @default(now()) updatedAt DateTime @updatedAt }
+model AuditEvent { id String @id @default(uuid()) siteId String robotId String? actorId String actorRole String eventType String payload Json hashPrev String? hashSelf String site Site @relation(fields: [siteId], references: [id]) createdAt DateTime @default(now()) updatedAt DateTime @updatedAt @@index([siteId, createdAt]) }
+model DowntimeEvent { id String @id @default(uuid()) robotId String startTs DateTime endTs DateTime durationS Int attribution DowntimeAttribution estCostUsd Decimal robot Robot @relation(fields: [robotId], references: [id]) createdAt DateTime @default(now()) updatedAt DateTime @updatedAt }
+model User { id String @id @default(uuid()) customerId String role String oidcSubject String @unique customer Customer @relation(fields: [customerId], references: [id]) createdAt DateTime @default(now()) updatedAt DateTime @updatedAt }

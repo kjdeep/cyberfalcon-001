@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion } from "motion/react";
 import {
-  Shield,
   Inbox,
   FileText,
   LogOut,

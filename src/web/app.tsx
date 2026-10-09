@@ -1,40 +1,47 @@
-import { Route, Switch } from "wouter";
 import { lazy, Suspense } from "react";
-import { Provider } from "./components/provider";
+import { Route, Switch } from "wouter";
 import { AgentFeedback } from "@runablehq/website-runtime";
+import { FleetShell } from "./components/fleet-shell";
 
-const Home = lazy(() => import("./pages/index"));
-const Services = lazy(() => import("./pages/services"));
-const About = lazy(() => import("./pages/about"));
-const Blog = lazy(() => import("./pages/blog"));
-const Contact = lazy(() => import("./pages/contact"));
-const Admin = lazy(() => import("./pages/admin"));
+const FleetOverview = lazy(() => import("./pages/fleetops").then((module) => ({ default: module.FleetOverview })));
+const RobotDetail = lazy(() => import("./pages/fleetops").then((module) => ({ default: module.RobotDetail })));
+const AlertsPage = lazy(() => import("./pages/fleetops").then((module) => ({ default: module.AlertsPage })));
+const TicketsPage = lazy(() => import("./pages/fleetops").then((module) => ({ default: module.TicketsPage })));
+const UpdatesPage = lazy(() => import("./pages/fleetops").then((module) => ({ default: module.UpdatesPage })));
+const PartsPage = lazy(() => import("./pages/fleetops").then((module) => ({ default: module.PartsPage })));
+const ReportsPage = lazy(() => import("./pages/fleetops").then((module) => ({ default: module.ReportsPage })));
+const AuditPage = lazy(() => import("./pages/fleetops").then((module) => ({ default: module.AuditPage })));
+const SettingsPage = lazy(() => import("./pages/fleetops").then((module) => ({ default: module.SettingsPage })));
+const RaasPage = lazy(() => import("./pages/fleetops").then((module) => ({ default: module.RaasPage })));
 
 function PageLoader() {
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center">
-      <div className="w-8 h-8 border-2 border-neon-red border-t-transparent rounded-full animate-spin" />
+    <div className="page-loader">
+      <span className="loader-mark"><img src="/falcon-logo.png" alt="" /></span>
+      <span>Loading operational data…</span>
     </div>
   );
 }
 
-function App() {
-  return (
-    <Provider>
-      <Suspense fallback={<PageLoader />}>
-        <Switch>
-          <Route path="/" component={Home} />
-          <Route path="/services" component={Services} />
-          <Route path="/about" component={About} />
-          <Route path="/blog" component={Blog} />
-          <Route path="/contact" component={Contact} />
-          <Route path="/admin" component={Admin} />
-        </Switch>
-      </Suspense>
-      {import.meta.env.DEV && <AgentFeedback />}
+function RoutedApp() {
+  return <FleetShell><Suspense fallback={<PageLoader />}><Switch>
+    <Route path="/" component={FleetOverview} />
+    <Route path="/fleet" component={FleetOverview} />
+    <Route path="/robots/:id">{(params) => <RobotDetail id={params.id} />}</Route>
+    <Route path="/alerts" component={AlertsPage} />
+    <Route path="/tickets" component={TicketsPage} />
+    <Route path="/updates" component={UpdatesPage} />
+    <Route path="/parts" component={PartsPage} />
+    <Route path="/reports" component={ReportsPage} />
+    <Route path="/audit" component={AuditPage} />
+    <Route path="/settings" component={SettingsPage} />
+    <Route path="/raas" component={RaasPage} />
+    <Route component={FleetOverview} />
+  </Switch></Suspense></FleetShell>;
+}
 
-    </Provider>
-  );
+function App() {
+  return <><RoutedApp />{import.meta.env.DEV && <AgentFeedback />}</>;
 }
 
 export default App;

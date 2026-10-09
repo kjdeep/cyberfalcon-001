@@ -1,0 +1,8 @@
+{
+  "name": "falconfleetops-backend",
+  "private": true,
+  "type": "module",
+  "scripts": { "dev:demo": "node run-demo.mjs", "build": "tsc -p tsconfig.json" },
+  "dependencies": { "@nestjs/common": "^11.0.0", "@nestjs/core": "^11.0.0", "@prisma/client": "^6.0.0" },
+  "devDependencies": { "prisma": "^6.0.0", "typescript": "^5.7.0" }
+}

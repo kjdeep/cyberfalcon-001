@@ -84,7 +84,7 @@ function NetworkGrid() {
       {/* Connection lines */}
       <lineSegments ref={linesRef}>
         <bufferGeometry>
-          <bufferAttribute attach="attributes-position" count={linePositions.length / 3} array={linePositions} itemSize={3} />
+          <bufferAttribute attach="attributes-position" args={[linePositions, 3]} count={linePositions.length / 3} />
         </bufferGeometry>
         <lineBasicMaterial color="#EC1C24" transparent opacity={0.06} />
       </lineSegments>
@@ -92,8 +92,8 @@ function NetworkGrid() {
       {/* Nodes */}
       <points ref={nodesRef}>
         <bufferGeometry>
-          <bufferAttribute attach="attributes-position" count={nodePositions.length / 3} array={nodePositions} itemSize={3} />
-          <bufferAttribute attach="attributes-color" count={nodeColors.length / 3} array={nodeColors} itemSize={3} />
+          <bufferAttribute attach="attributes-position" count={nodePositions.length / 3} args={[nodePositions, 3]} array={nodePositions} itemSize={3} />
+          <bufferAttribute attach="attributes-color" count={nodeColors.length / 3} args={[nodeColors, 3]} array={nodeColors} itemSize={3} />
         </bufferGeometry>
         <pointsMaterial size={0.08} vertexColors transparent opacity={0.7} sizeAttenuation blending={AdditiveBlending} />
       </points>
@@ -183,8 +183,8 @@ function DataParticles() {
   return (
     <points ref={ref}>
       <bufferGeometry>
-        <bufferAttribute attach="attributes-position" count={count} array={positions} itemSize={3} />
-        <bufferAttribute attach="attributes-color" count={count} array={colors} itemSize={3} />
+        <bufferAttribute attach="attributes-position" count={count} args={[positions, 3]} array={positions} itemSize={3} />
+        <bufferAttribute attach="attributes-color" count={count} args={[colors, 3]} array={colors} itemSize={3} />
       </bufferGeometry>
       <pointsMaterial size={0.03} vertexColors transparent opacity={0.5} sizeAttenuation blending={AdditiveBlending} />
     </points>
@@ -266,7 +266,7 @@ function ShieldWireframe() {
       {/* Shield outline */}
       <lineSegments>
         <bufferGeometry>
-          <bufferAttribute attach="attributes-position" count={shieldGeo.length / 3} array={shieldGeo} itemSize={3} />
+          <bufferAttribute attach="attributes-position" count={shieldGeo.length / 3} args={[shieldGeo, 3]} array={shieldGeo} itemSize={3} />
         </bufferGeometry>
         <lineBasicMaterial color="#EC1C24" transparent opacity={0.12} />
       </lineSegments>
@@ -318,7 +318,7 @@ function HexGrid() {
   return (
     <points ref={ref}>
       <bufferGeometry>
-        <bufferAttribute attach="attributes-position" count={positions.length / 3} array={positions} itemSize={3} />
+        <bufferAttribute attach="attributes-position" count={positions.length / 3} args={[positions, 3]} array={positions} itemSize={3} />
       </bufferGeometry>
       <pointsMaterial size={0.02} color="#EC1C24" transparent opacity={0.15} sizeAttenuation />
     </points>
